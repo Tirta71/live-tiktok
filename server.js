@@ -3,7 +3,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const { WebcastPushConnection } = require("tiktok-live-connector");
 
-const username = "mohammadchairul";
+const username = "allegiaant";
 const tiktok = new WebcastPushConnection(username, {
   msToken: "PASTE_MS_TOKEN_DISINI",
 });
