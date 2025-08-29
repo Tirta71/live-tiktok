@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <title>TikTok Gift & Claim</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: { fontFamily: { sans: ["Inter", "system-ui", "Arial"] } },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      summary {
+        list-style: none;
+        cursor: pointer;
+      }
+      summary::-webkit-details-marker {
+        display: none;
+      }
+      details[open] .chev {
+        transform: rotate(180deg);
+      }
+    </style>
+  </head>
+  <body
+    class="h-full bg-gradient-to-b from-slate-50 to-white text-slate-800 dark:from-slate-900 dark:to-slate-950 dark:text-slate-100"
+  >
+    <div class="max-w-6xl mx-auto px-4 py-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold tracking-tight">
+            🎁 TikTok Gift & Claim
+          </h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400">
+            Realtime log gift dan klaim username dari livestream
+          </p>
+        </div>
+        <button
+          id="toggleTheme"
+          class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm hover:opacity-90 transition"
+        >
+          <svg
+            id="sun"
+            class="h-4 w-4 hidden dark:inline"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42zm10.48 0l1.79-1.8 1.41 1.41-1.8 1.79-1.4-1.4zM12 4V1h-0v3h0zm0 19v-3h0v3h0zM4 12H1v0h3v0zm19 0h-3v0h3v0zM6.76 19.16l-1.42 1.42-1.79-1.8 1.41-1.41 1.8 1.79zm12.69-.38l1.8 1.79-1.41 1.41-1.79-1.8 1.4-1.4zM12 6a6 6 0 100 12 6 6 0 000-12z"
+            />
+          </svg>
+          <svg
+            id="moon"
+            class="h-4 w-4 dark:hidden"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M21.64 13a9 9 0 01-11.31 8.73A9 9 0 1012 3a7 7 0 009.64 10z"
+            />
+          </svg>
+          <span class="hidden md:inline">Tema</span>
+        </button>
+      </div>
+
+      <div class="mb-6">
+        <div
+          id="status"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm dark:bg-slate-900/50 dark:border-slate-800 dark:text-slate-300"
+        >
+          <span
+            class="inline-block h-2.5 w-2.5 rounded-full bg-amber-400 animate-pulse"
+          ></span>
+          Menunggu event…
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section
+          class="bg-white/70 backdrop-blur border border-slate-200 rounded-2xl shadow-sm p-4 dark:bg-slate-900/40 dark:border-slate-800"
+        >
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <div
+                class="h-8 w-8 rounded-xl bg-violet-100 text-violet-700 grid place-items-center dark:bg-violet-900/30 dark:text-violet-300"
+              >
+                🎁
+              </div>
+              <h2 class="text-lg font-semibold">Gift Masuk</h2>
+            </div>
+            <span
+              id="giftCount"
+              class="text-xs px-2 py-1 rounded-full bg-violet-50 text-violet-700 border border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800"
+              >0</span
+            >
+          </div>
+          <div
+            id="gifts"
+            class="grid gap-3 max-h-[70vh] overflow-auto pr-1"
+          ></div>
+        </section>
+
+        <section
+          class="bg-white/70 backdrop-blur border border-slate-200 rounded-2xl shadow-sm p-4 dark:bg-slate-900/40 dark:border-slate-800"
+        >
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <div
+                class="h-8 w-8 rounded-xl bg-emerald-100 text-emerald-700 grid place-items-center dark:bg-emerald-900/30 dark:text-emerald-300"
+              >
+                ✅
+              </div>
+              <h2 class="text-lg font-semibold">Klaim Username</h2>
+            </div>
+            <span
+              id="claimCount"
+              class="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800"
+              >0</span
+            >
+          </div>
+          <div
+            id="claims"
+            class="grid gap-3 max-h-[70vh] overflow-auto pr-1"
+          ></div>
+        </section>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      // Toggle tema
+      const toggleBtn = document.getElementById("toggleTheme");
+      const root = document.documentElement;
+      toggleBtn.addEventListener("click", () => root.classList.toggle("dark"));
+
+      // Socket
+      const socket = io({ transports: ["websocket"] });
+
+      // DOM refs
+      const statusEl = document.getElementById("status");
+      const giftsEl = document.getElementById("gifts");
+      const claimsEl = document.getElementById("claims");
+      const giftCountEl = document.getElementById("giftCount");
+      const claimCountEl = document.getElementById("claimCount");
+
+      // Helpers
+      const timeStr = (ms) => new Date(ms).toLocaleString();
+      const avatar = (name) => {
+        const ch = (name || "?").trim().charAt(0).toUpperCase();
+        return `<div class="h-9 w-9 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200 grid place-items-center font-semibold">${ch}</div>`;
+      };
+
+      // === Regex & helper deteksi klaim (CLIENT-SIDE FALLBACK) ===
+      const RE_USN_KV =
+        /\b(?:usn|username)\b\s*[:=]?\s*([A-Za-z0-9._-]{3,20})/i;
+      const RE_AT = /@([A-Za-z0-9._-]{3,20})/;
+      function extractClaimedUsername(text) {
+        if (!text) return null;
+        const kv = RE_USN_KV.exec(text);
+        if (kv?.[1]) return kv[1];
+        const at = RE_AT.exec(text);
+        if (at?.[1]) return at[1];
+        return null;
+      }
+
+      // Status UI
+      socket.on("connect", () => {
+        statusEl.innerHTML = `<span class="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Terhubung`;
+        statusEl.classList.remove(
+          "border-slate-200",
+          "bg-white",
+          "text-slate-600"
+        );
+        statusEl.classList.add(
+          "border-emerald-200",
+          "bg-emerald-50",
+          "text-emerald-700",
+          "dark:bg-emerald-900/20",
+          "dark:border-emerald-800",
+          "dark:text-emerald-300"
+        );
+      });
+      socket.on("disconnect", () => {
+        statusEl.innerHTML = `<span class="inline-block h-2.5 w-2.5 rounded-full bg-rose-500"></span> Terputus`;
+        statusEl.classList.remove(
+          "border-emerald-200",
+          "bg-emerald-50",
+          "text-emerald-700"
+        );
+        statusEl.classList.add(
+          "border-rose-200",
+          "bg-rose-50",
+          "text-rose-700",
+          "dark:bg-rose-900/20",
+          "dark:border-rose-800",
+          "dark:text-rose-300"
+        );
+      });
+
+      // Counters
+      let giftCount = 0;
+      let claimCount = 0;
+      const incGift = () => (giftCountEl.textContent = ++giftCount);
+      const incClaim = () => (claimCountEl.textContent = ++claimCount);
+      const decClaim = () =>
+        (claimCountEl.textContent = claimCount = Math.max(0, claimCount - 1));
+
+      // State maps
+      const commentCards = new Map(); // tiktokId -> div
+      const claimCards = new Map(); // tiktokId -> details
+
+      // Gift card
+      function renderGift(p) {
+        const card = document.createElement("div");
+        card.className =
+          "rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/50";
+        const coinBadge =
+          typeof p.coins === "number"
+            ? `<span class="ml-2 inline-flex items-center gap-1 text-[11px] rounded-full border px-2 py-0.5 border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">${p.coins} coin</span>`
+            : "";
+        card.innerHTML = `
+      <div class="flex items-start gap-3">
+        ${avatar(p.nickname)}
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center justify-between">
+            <div class="truncate font-semibold">
+              ${p.nickname}
+              <span class="ml-1 text-xs text-slate-500">(${p.tiktokId})</span>
+            </div>
+            <div>
+              <span class="inline-flex items-center gap-1 text-xs font-semibold rounded-full border px-2 py-0.5 border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800 dark:bg-violet-900/20 dark:text-violet-300">
+                ${p.giftName} ×${p.repeatCount}
+              </span>
+              ${coinBadge}
+            </div>
+          </div>
+          <div class="text-xs text-slate-500 mt-1">${timeStr(p.timestamp)}</div>
+        </div>
+      </div>`;
+        giftsEl.prepend(card);
+        incGift();
+      }
+
+      // Claim card (tombol HAPUS di summary, selalu terlihat)
+      function renderClaim(p) {
+        const comments = Array.isArray(p.lastComments) ? p.lastComments : [];
+
+        // replace jika sudah ada
+        const existing = claimCards.get(p.tiktokId);
+        if (existing) {
+          existing.remove();
+          claimCards.delete(p.tiktokId);
+        }
+
+        const card = document.createElement("details");
+        card.className =
+          "rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/50";
+        card.open = true; // default kebuka agar semuanya langsung terlihat
+        claimCards.set(p.tiktokId, card);
+
+        card.innerHTML = `
+      <summary class="flex items-start gap-3">
+        ${avatar(p.nickname)}
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center justify-between">
+            <div class="truncate font-semibold">
+              ${p.nickname}
+              <span class="ml-1 text-xs text-slate-500">(${p.tiktokId})</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center gap-1 text-xs font-semibold rounded-full border px-2 py-0.5 border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300">
+                Total Coin: ${p.totalCoins ?? 0}
+              </span>
+              <button type="button" class="delete-btn inline-flex items-center rounded-md bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold px-3 py-1.5 transition">
+                ❌ Hapus
+              </button>
+            </div>
+          </div>
+          <div class="mt-1">
+            <span class="text-sm text-slate-600 dark:text-slate-200">Klaim:</span>
+            <span class="ml-1 text-base font-bold text-emerald-600 dark:text-emerald-300">@${
+              p.claimedUsername
+            }</span>
+          </div>
+          <div class="text-xs text-slate-500 mt-1">${timeStr(p.timestamp)}</div>
+        </div>
+        <div class="chev ml-3 text-slate-400 transition-transform">▼</div>
+      </summary>
+
+      <div class="mt-3 pl-12">
+        ${
+          comments.length
+            ? `
+              <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Komentar terakhir (maks 5):</div>
+              <ul class="space-y-1">
+                ${comments
+                  .map(
+                    (c, i) => `
+                  <li class="text-sm text-slate-700 dark:text-slate-200">
+                    <span class="text-slate-400 dark:text-slate-500 mr-1">#${
+                      i + 1
+                    }</span>${c}
+                  </li>`
+                  )
+                  .join("")}
+              </ul>
+            `
+            : `<div class="text-sm text-slate-500 dark:text-slate-400">Belum ada riwayat komentar.</div>`
+        }
+      </div>
+    `;
+
+        // Tombol Hapus -> hapus lokal + reset server + broadcast remove
+        card.querySelector(".delete-btn").addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation(); // jangan toggle <details>
+
+          if (claimCards.has(p.tiktokId)) {
+            claimCards.get(p.tiktokId).remove();
+            claimCards.delete(p.tiktokId);
+            decClaim();
+          }
+          const c = commentCards.get(p.tiktokId);
+          if (c) {
+            c.remove();
+            commentCards.delete(p.tiktokId);
+          }
+
+          socket.emit("resolve_claim", {
+            tiktokId: p.tiktokId,
+            timestamp: Date.now(),
+          });
+        });
+
+        claimsEl.prepend(card);
+        incClaim();
+        console.log("[UI] renderClaim:", p); // log bantu debug
+      }
+
+      // Comments (rolling ≤5) + CLIENT-SIDE FALLBACK to claim
+      function renderCommentsUpdate(p) {
+        let card = commentCards.get(p.tiktokId);
+        if (!card) {
+          card = document.createElement("div");
+          card.className =
+            "rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/50";
+          commentCards.set(p.tiktokId, card);
+          claimsEl.prepend(card);
+        }
+
+        card.innerHTML = `
+    <div class="flex items-start gap-3">
+      ${avatar(p.nickname)}
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center justify-between">
+          <div class="truncate font-semibold">
+            ${p.nickname}
+            <span class="ml-1 text-xs text-slate-500">(${p.tiktokId})</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1 text-xs font-semibold rounded-full border px-2 py-0.5 border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
+              Coins: ${p.totalCoins ?? 0}
+            </span>
+            <!-- Tombol Hapus selalu muncul -->
+            <button type="button"
+              class="delete-btn inline-flex items-center rounded-md bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold px-3 py-1.5 transition"
+              title="Hapus & reset state">
+              ❌ Hapus
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-2">
+          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
+            Komentar (maks 5, terbaru di bawah):
+          </div>
+          <ul class="space-y-1">
+            ${(p.comments || [])
+              .map(
+                (c, i) => `
+                <li class="text-sm text-slate-700 dark:text-slate-200">
+                  <span class="text-slate-400 dark:text-slate-500 mr-1">#${
+                    i + 1
+                  }</span>${c}
+                </li>`
+              )
+              .join("")}
+          </ul>
+        </div>
+
+        <div class="text-xs text-slate-500 mt-2">${timeStr(p.timestamp)}</div>
+      </div>
+    </div>
+  `;
+
+        // Handler tombol Hapus (selalu ada)
+        const btn = card.querySelector(".delete-btn");
+        if (btn && !btn._wired) {
+          btn._wired = true; // cegah double-bind saat re-render
+          btn.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            // 1) Hapus kartu komentar ini
+            const c = commentCards.get(p.tiktokId);
+            if (c) {
+              c.remove();
+              commentCards.delete(p.tiktokId);
+            }
+
+            // 2) Jika ada kartu klaim untuk user ini, hapus juga & kurangi counter
+            const claim = claimCards.get(p.tiktokId);
+            if (claim) {
+              claim.remove();
+              claimCards.delete(p.tiktokId);
+              // decClaim() dari variabel globalmu
+              if (typeof decClaim === "function") decClaim();
+            }
+
+            // 3) Beritahu server untuk RESET state (gift berikutnya mulai dari nol)
+            socket.emit("resolve_claim", {
+              tiktokId: p.tiktokId,
+              timestamp: Date.now(),
+            });
+          });
+        }
+      }
+
+      // Socket events
+      socket.on("gift", renderGift);
+      socket.on("claim", (p) => {
+        console.log("[socket] claim:", p);
+        renderClaim(p);
+      });
+      socket.on("comments_update", renderCommentsUpdate);
+
+      // Hapus sinkron bila ada client lain yang menghapus
+      socket.on("claim_removed", ({ tiktokId }) => {
+        const card = claimCards.get(tiktokId);
+        if (card) {
+          card.remove();
+          claimCards.delete(tiktokId);
+          decClaim();
+        }
+        const c = commentCards.get(tiktokId);
+        if (c) {
+          c.remove();
+          commentCards.delete(tiktokId);
+        }
+      });
+    </script>
+  </body>
+</html>
