@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Riwayat Pemenang</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body class="bg-gray-100 p-8 font-sans">
+    <h1 class="text-2xl font-bold mb-6 text-center">
+      📜 Riwayat Pemenang Spin Wheel
+    </h1>
+
+    <!-- Pending Table -->
+    <h2 class="text-xl font-semibold mb-3 text-yellow-700">⏳ Pending</h2>
+    <div class="overflow-x-auto shadow-lg rounded-lg mb-8">
+      <table class="min-w-full bg-white border border-gray-300">
+        <thead class="bg-yellow-500 text-white">
+          <tr>
+            <th class="py-3 px-4 border">Username TikTok</th>
+            <th class="py-3 px-4 border">Username Roblox</th>
+            <th class="py-3 px-4 border">Prize</th>
+            <th class="py-3 px-4 border">Total Spin</th>
+            <th class="py-3 px-4 border">Total SX</th>
+            <th class="py-3 px-4 border">Terakhir Menang</th>
+            <th class="py-3 px-4 border">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="pendingTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Selesai Table -->
+    <h2 class="text-xl font-semibold mb-3 text-green-700">✔ Selesai</h2>
+    <div class="overflow-x-auto shadow-lg rounded-lg">
+      <table class="min-w-full bg-white border border-gray-300">
+        <thead class="bg-green-600 text-white">
+          <tr>
+            <th class="py-3 px-4 border">Username TikTok</th>
+            <th class="py-3 px-4 border">Username Roblox</th>
+            <th class="py-3 px-4 border">Prize</th>
+            <th class="py-3 px-4 border">Total Spin</th>
+            <th class="py-3 px-4 border">Total SX</th>
+            <th class="py-3 px-4 border">Terakhir Menang</th>
+          </tr>
+        </thead>
+        <tbody id="doneTable"></tbody>
+      </table>
+    </div>
+
+    <script>
+      async function loadWinners() {
+        const res = await fetch("/api/winners");
+        const data = await res.json();
+
+        const pendingBody = document.getElementById("pendingTable");
+        const doneBody = document.getElementById("doneTable");
+        pendingBody.innerHTML = "";
+        doneBody.innerHTML = "";
+
+        data.forEach((row) => {
+          const tr = document.createElement("tr");
+          tr.classList.add("hover:bg-gray-50");
+
+          const safeId = row.id || row.username.replace(/[^a-zA-Z0-9_-]/g, "_");
+
+          const cols = `
+            <td class="py-2 px-4 border">@${row.username}</td>
+            <td class="py-2 px-4 border">
+              ${
+                row.status === "pending"
+                  ? `<input id="roblox_${safeId}" 
+                            type="text" 
+                            placeholder="Isi username roblox"
+                            value="${row.username_roblox || ""}" 
+                            class="px-2 py-1 border rounded w-40"/>`
+                  : row.username_roblox || "-"
+              }
+            </td>
+            <td class="py-2 px-4 border">${row.prizes}</td>
+            <td class="py-2 px-4 border text-center">${row.total_spin}</td>
+            <td class="py-2 px-4 border text-center">${row.total_sx}</td>
+            <td class="py-2 px-4 border text-sm text-gray-600">${new Date(
+              row.last_win
+            ).toLocaleString()}</td>
+          `;
+
+          if (row.status === "pending") {
+            tr.innerHTML =
+              cols +
+              `<td class="py-2 px-4 border text-center space-x-2">
+                <button onclick="saveRoblox(${row.id}, '${safeId}')"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                  Simpan Roblox
+                </button>
+                <button onclick="claimWinner(${row.id})"
+                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
+                  Claim
+                </button>
+              </td>`;
+            pendingBody.appendChild(tr);
+          } else {
+            tr.innerHTML = cols;
+            doneBody.appendChild(tr);
+          }
+        });
+      }
+
+      async function saveRoblox(id, safeId) {
+        const val = document.getElementById(`roblox_${safeId}`).value;
+
+        await fetch(`/api/updateRoblox/${id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ usernameRoblox: val }),
+        });
+
+        Swal.fire({
+          title: "✅ Tersimpan",
+          text: "Username Roblox berhasil disimpan!",
+          icon: "success",
+        });
+
+        loadWinners();
+      }
+
+      async function claimWinner(id) {
+        const confirm = await Swal.fire({
+          title: "Konfirmasi",
+          text: `Apakah kamu yakin ingin claim hadiah untuk ID ${id}?`,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Ya, Claim",
+          cancelButtonText: "Batal",
+        });
+
+        if (confirm.isConfirmed) {
+          await fetch(`/api/claim/${id}`, { method: "POST" });
+          Swal.fire("🎉 Selesai", "Hadiah berhasil di-claim!", "success");
+          loadWinners();
+        }
+      }
+
+      loadWinners();
+    </script>
+  </body>
+</html>

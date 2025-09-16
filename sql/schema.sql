@@ -1,0 +1,11 @@
+CREATE DATABASE spin_wheel;
+USE spin_wheel;
+
+CREATE TABLE winners (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(100) NOT NULL,
+  prize VARCHAR(100) NOT NULL,
+  total_spin INT DEFAULT 1,
+  total_sx INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Spin Wheel 🎡</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(270deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb);
+        background-size: 800% 800%;
+        animation: gradientBG 20s ease infinite;
+        min-height: 100vh;
+        margin: 0;
+        justify-content: center;
+      }
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      #wheelCanvas {
+        border: 8px solid #333;
+        border-radius: 50%;
+        transition: transform 11s cubic-bezier(0.05, 1, 0.2, 1);
+        box-shadow: 0 0 25px rgba(255, 255, 255, 0.7),
+          0 0 50px rgba(255, 255, 255, 0.4);
+      }
+      #pointer {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 60px;
+        height: 60px;
+        background: radial-gradient(circle, #ff3838, #b30000);
+        border: 3px solid #fff;
+        border-radius: 50%;
+        transform: translate(-50%, -60%);
+        z-index: 3;
+        box-shadow: 0 0 12px rgba(255, 56, 56, 0.8), 0 0 25px rgba(0, 0, 0, 0.6);
+      }
+      #pointer::after {
+        content: "";
+        width: 0;
+        height: 0;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-bottom: 35px solid #fff200;
+        filter: drop-shadow(0 0 6px rgba(255, 242, 0, 0.8));
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="mb-10 text-3xl font-bold text-white drop-shadow-lg">
+      🎡 Spin Wheel TikTok Gift
+    </h1>
+
+    <!-- Wheel -->
+    <div class="relative inline-block">
+      <canvas id="wheelCanvas" width="400" height="400"></canvas>
+      <div id="pointer"></div>
+    </div>
+
+    <!-- <div
+      id="winner"
+      class="mt-6 text-xl font-semibold text-black drop-shadow-lg animate-pulse"
+    >
+      Menunggu gift...
+    </div> -->
+
+    <!-- Tombol tester -->
+    <button
+      onclick="socket.emit('manual_spin', { username: '' })"
+      class="mt-10 px-6 py-3 rounded-lg bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold shadow-md hover:scale-105 hover:shadow-xl transition"
+    >
+      🎲 Coba Spin
+    </button>
+
+    <!-- Modal -->
+    <div
+      id="winModal"
+      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
+    >
+      <div
+        class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full text-center"
+      >
+        <h2 class="text-xl font-bold text-gray-800 mb-3">🎉 Selamat!</h2>
+        <p id="modalMessage" class="text-gray-700 text-lg font-medium"></p>
+      </div>
+    </div>
+
+    <!-- Sound -->
+    <audio id="tickSound" src="sounds/spinning-wheel.mp3"></audio>
+    <audio id="winSound" src="sounds/winners_W9Cpenj.mp3"></audio>
+
+    <script>
+      const prizes = [
+        { name: "1 SX", weight: 20 },
+        { name: "MEGA DRAGONFLY", weight: 0.00001 },
+        { name: "2 SX", weight: 20 },
+        { name: "3 SX", weight: 10 },
+        { name: "4 SX", weight: 20 },
+        { name: "HADIAH UTAMA", weight: 0.0001 },
+        { name: "5 SX", weight: 20 },
+        { name: "6 SX", weight: 10 },
+        { name: "7 SX", weight: 0.5 },
+        { name: "DragonFly", weight: 0.1 },
+        { name: "8 SX", weight: 0.5 },
+        { name: "9 SX", weight: 0.5 },
+        { name: "Coacktrice", weight: 0.5 },
+        { name: "10 SX", weight: 0.1 },
+        { name: "11 SX", weight: 0.1 },
+        { name: "12 SX", weight: 0.1 },
+        { name: "PHONEIX", weight: 0.5 },
+        { name: "13 SX", weight: 0.1 },
+        { name: "14 SX", weight: 0.1 },
+        { name: "15 SX", weight: 0.1 },
+        { name: "T-rex", weight: 0.1 },
+      ];
+      function weightedRandom(items) {
+        const guaranteed = items.find((i) => i.weight === 100);
+        if (guaranteed) return guaranteed;
+
+        const total = items.reduce((s, i) => s + i.weight, 0);
+        const rand = Math.random() * total;
+        let cum = 0;
+        for (const i of items) {
+          cum += i.weight;
+          if (rand <= cum) return i;
+        }
+        return items[items.length - 1];
+      }
+
+      const canvas = document.getElementById("wheelCanvas");
+      const ctx = canvas.getContext("2d");
+      const radius = canvas.width / 2;
+
+      function drawWheel() {
+        const arc = (2 * Math.PI) / prizes.length;
+        prizes.forEach((prize, i) => {
+          const angle = i * arc;
+          ctx.beginPath();
+          ctx.fillStyle = `hsl(${(i * 360) / prizes.length}, 80%, 60%)`;
+          ctx.moveTo(radius, radius);
+          ctx.arc(radius, radius, radius, angle, angle + arc);
+          ctx.fill();
+
+          ctx.save();
+          ctx.translate(
+            radius + Math.cos(angle + arc / 2) * radius * 0.65,
+            radius + Math.sin(angle + arc / 2) * radius * 0.65
+          );
+          ctx.rotate(angle + arc / 2);
+          ctx.font = "bold 12px sans-serif";
+          ctx.fillStyle = "#000";
+          ctx.strokeStyle = "#fff";
+          ctx.lineWidth = 3;
+          ctx.strokeText(prize.name, -ctx.measureText(prize.name).width / 2, 0);
+          ctx.fillText(prize.name, -ctx.measureText(prize.name).width / 2, 0);
+          ctx.restore();
+        });
+      }
+      drawWheel();
+
+      // === Spin ===
+      function spin(username) {
+        const prize = weightedRandom(prizes);
+        const arc = (2 * Math.PI) / prizes.length;
+        const prizeIndex = prizes.indexOf(prize);
+        const prizeAngle = prizeIndex * arc + Math.random() * arc;
+        const stopDeg = (270 - (prizeAngle * 180) / Math.PI + 360) % 360;
+        const finalDeg = 360 * 6 + stopDeg;
+
+        canvas.style.transition = "none";
+        canvas.style.transform = `rotate(0deg)`;
+        void canvas.offsetWidth;
+
+        canvas.style.transition = "transform 11s cubic-bezier(0.05, 1, 0.2, 1)";
+        requestAnimationFrame(() => {
+          canvas.style.transform = `rotate(${finalDeg}deg)`;
+        });
+
+        document.getElementById("tickSound").play();
+
+        setTimeout(() => {
+          document.getElementById("winSound").play();
+
+          const modal = document.getElementById("winModal");
+          const modalMsg = document.getElementById("modalMessage");
+          modalMsg.textContent = `@${username} memenangkan: ${prize.name}`;
+          modal.classList.remove("hidden");
+          modal.classList.add("flex");
+
+          setTimeout(() => {
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+          }, 3000);
+
+          // kirim hasil ke server
+          socket.emit("winner_result", {
+            username,
+            prize: prize.name,
+            spin: 1,
+            sx: prize.name.match(/^(\d+)\s*SX$/i) ? parseInt(prize.name) : 0,
+          });
+        }, 11000);
+      }
+
+      // === Socket.IO ===
+      const socket = io();
+
+      // spin dipicu dari server (gift / manual tester)
+      socket.on("wheel_spin", (data) => {
+        spin(data.nickname || data.tiktokId, data.prize);
+      });
+    </script>
+  </body>
+</html>

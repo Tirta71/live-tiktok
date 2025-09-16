@@ -2,7 +2,7 @@
 <html lang="id" class="h-full">
   <head>
     <meta charset="utf-8" />
-    <title>TikTok Gift & Claim</title>
+    <title>TikTok Gift & Claim — Full App + Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -35,6 +35,7 @@
     class="h-full bg-gradient-to-b from-slate-50 to-white text-slate-800 dark:from-slate-900 dark:to-slate-950 dark:text-slate-100"
   >
     <div class="max-w-6xl mx-auto px-4 py-6">
+      <!-- Header -->
       <div class="flex items-center justify-between mb-6">
         <div>
           <h1 class="text-2xl md:text-3xl font-bold tracking-tight">
@@ -72,6 +73,7 @@
         </button>
       </div>
 
+      <!-- Connection Status -->
       <div class="mb-6">
         <div
           id="status"
@@ -84,7 +86,9 @@
         </div>
       </div>
 
+      <!-- Main Grid: Gifts & Claims -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Gifts -->
         <section
           class="bg-white/70 backdrop-blur border border-slate-200 rounded-2xl shadow-sm p-4 dark:bg-slate-900/40 dark:border-slate-800"
         >
@@ -109,6 +113,7 @@
           ></div>
         </section>
 
+        <!-- Claims -->
         <section
           class="bg-white/70 backdrop-blur border border-slate-200 rounded-2xl shadow-sm p-4 dark:bg-slate-900/40 dark:border-slate-800"
         >
@@ -133,103 +138,182 @@
           ></div>
         </section>
       </div>
+
+      <!-- Calculator Section -->
+      <div class="mt-10">
+        <section
+          class="bg-white/70 backdrop-blur border border-slate-200 rounded-2xl shadow-sm p-4 dark:bg-slate-900/40 dark:border-slate-800"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <div
+                class="h-8 w-8 rounded-xl bg-indigo-100 text-indigo-700 grid place-items-center dark:bg-indigo-900/30 dark:text-indigo-300"
+              >
+                🧮
+              </div>
+              <h2 class="text-lg font-semibold">Calculator Fee</h2>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <label for="feePercent" class="text-slate-600 dark:text-slate-300"
+                >Fee</label
+              >
+              <input
+                id="feePercent"
+                type="number"
+                step="0.1"
+                min="0"
+                value="11.5"
+                class="w-20 rounded-lg border border-slate-300 px-2 py-1 text-right focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:bg-slate-800 dark:border-slate-700"
+              />
+              <span class="text-slate-600 dark:text-slate-300">%</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col md:flex-row gap-3 mb-4">
+            <input
+              id="calcInput"
+              type="text"
+              placeholder="Masukkan angka (contoh: 2sx, 1000000000000)"
+              class="flex-1 rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:bg-slate-800 dark:border-slate-700"
+            />
+            <button
+              onclick="hitungCalc()"
+              class="rounded-xl bg-indigo-600 text-white px-5 py-2 font-semibold hover:bg-indigo-700 active:scale-[0.99] transition"
+            >
+              Hitung
+            </button>
+          </div>
+
+          <div
+            id="calcError"
+            class="hidden mt-2 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 px-3 py-2 text-sm dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-300"
+          ></div>
+
+          <div id="calcResult" class="hidden space-y-2 text-sm">
+            <div class="flex justify-between gap-4">
+              <span class="text-slate-500">Nilai asli</span
+              ><span id="calcBase" class="font-mono"></span>
+            </div>
+            <div class="flex justify-between gap-4">
+              <span class="text-slate-500">Fee</span
+              ><span id="calcFee" class="font-mono"></span>
+            </div>
+            <div class="flex items-center justify-between gap-2 border-t pt-2">
+              <span class="text-slate-700 font-medium">Total + Fee</span>
+              <div class="flex items-center gap-2">
+                <span id="calcTotal" class="font-mono font-semibold"></span>
+                <button
+                  onclick="copyCalc()"
+                  class="text-xs px-2 py-1 rounded bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
+                >
+                  Copy
+                </button>
+                <span
+                  id="calcCopyMsg"
+                  class="text-green-600 text-xs font-medium hidden"
+                  >✔ Disalin!</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-500 mt-3">
+            Input mendukung
+            <span class="font-semibold">Sx</span> (10<sup>21</sup>) seperti
+            <code>1.5sx</code> atau angka penuh. Persentase fee dapat diubah.
+          </p>
+        </section>
+        <div class="mt-10">
+          <section
+            class="bg-white/70 backdrop-blur border border-slate-200 rounded-2xl shadow-sm p-4 dark:bg-slate-900/40 dark:border-slate-800"
+          >
+            <div class="flex items-center gap-2 mb-4">
+              <div
+                class="h-8 w-8 rounded-xl bg-pink-100 text-pink-700 grid place-items-center dark:bg-pink-900/30 dark:text-pink-300"
+              >
+                ➕
+              </div>
+              <h2 class="text-lg font-semibold">Calculator Sederhana</h2>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-3 mb-4">
+              <input
+                id="num1"
+                type="number"
+                value="5"
+                readonly
+                class="flex-1 rounded-xl border border-slate-300 px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600"
+              />
+              <select
+                id="operator"
+                class="rounded-xl border border-slate-300 px-3 py-2 dark:bg-slate-800 dark:border-slate-700"
+              >
+                <option value="+">+</option>
+                <option value="-">−</option>
+                <option value="*">×</option>
+                <option value="/">÷</option>
+              </select>
+              <input
+                id="num2"
+                type="number"
+                placeholder="Angka kedua"
+                class="flex-1 rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-4 focus:ring-pink-100 dark:bg-slate-800 dark:border-slate-700"
+              />
+              <button
+                onclick="simpleCalc()"
+                class="rounded-xl bg-pink-600 text-white px-5 py-2 font-semibold hover:bg-pink-700 active:scale-[0.99] transition"
+              >
+                Hitung
+              </button>
+            </div>
+
+            <div
+              id="simpleResult"
+              class="hidden mt-2 rounded-lg border border-green-200 bg-green-50 text-green-700 px-3 py-2 text-sm dark:bg-green-900/20 dark:border-green-800 dark:text-green-300"
+            ></div>
+          </section>
+        </div>
+      </div>
     </div>
 
+    <!-- Socket.IO -->
     <script
       src="https://cdn.socket.io/4.7.5/socket.io.min.js"
       crossorigin="anonymous"
     ></script>
     <script>
-      // Toggle tema
-      const toggleBtn = document.getElementById("toggleTheme");
-      const root = document.documentElement;
-      toggleBtn.addEventListener("click", () => root.classList.toggle("dark"));
-
-      // Socket
-      const socket = io({ transports: ["websocket"] });
-
-      // DOM refs
-      const statusEl = document.getElementById("status");
-      const giftsEl = document.getElementById("gifts");
-      const claimsEl = document.getElementById("claims");
-      const giftCountEl = document.getElementById("giftCount");
-      const claimCountEl = document.getElementById("claimCount");
-
-      // Helpers
+      // === Helpers ===
+      function formatSX(val) {
+        if (isNaN(val)) return "0sx";
+        return val % 1 === 0 ? `${val.toFixed(0)}sx` : `${val.toFixed(2)}sx`;
+      }
       const timeStr = (ms) => new Date(ms).toLocaleString();
       const avatar = (name) => {
         const ch = (name || "?").trim().charAt(0).toUpperCase();
         return `<div class="h-9 w-9 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200 grid place-items-center font-semibold">${ch}</div>`;
       };
 
-      // === Regex & helper deteksi klaim (CLIENT-SIDE FALLBACK) ===
-      const RE_USN_KV =
-        /\b(?:usn|username)\b\s*[:=]?\s*([A-Za-z0-9._-]{3,20})/i;
-      const RE_AT = /@([A-Za-z0-9._-]{3,20})/;
-      function extractClaimedUsername(text) {
-        if (!text) return null;
-        const kv = RE_USN_KV.exec(text);
-        if (kv?.[1]) return kv[1];
-        const at = RE_AT.exec(text);
-        if (at?.[1]) return at[1];
-        return null;
-      }
-
-      // Status UI
-      socket.on("connect", () => {
-        statusEl.innerHTML = `<span class="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Terhubung`;
-        statusEl.classList.remove(
-          "border-slate-200",
-          "bg-white",
-          "text-slate-600"
-        );
-        statusEl.classList.add(
-          "border-emerald-200",
-          "bg-emerald-50",
-          "text-emerald-700",
-          "dark:bg-emerald-900/20",
-          "dark:border-emerald-800",
-          "dark:text-emerald-300"
-        );
-      });
-      socket.on("disconnect", () => {
-        statusEl.innerHTML = `<span class="inline-block h-2.5 w-2.5 rounded-full bg-rose-500"></span> Terputus`;
-        statusEl.classList.remove(
-          "border-emerald-200",
-          "bg-emerald-50",
-          "text-emerald-700"
-        );
-        statusEl.classList.add(
-          "border-rose-200",
-          "bg-rose-50",
-          "text-rose-700",
-          "dark:bg-rose-900/20",
-          "dark:border-rose-800",
-          "dark:text-rose-300"
-        );
-      });
-
-      // Counters
-      let giftCount = 0;
-      let claimCount = 0;
+      // === State ===
+      const socket = io({ transports: ["websocket"] });
+      const giftsEl = document.getElementById("gifts");
+      const claimsEl = document.getElementById("claims");
+      const giftCountEl = document.getElementById("giftCount");
+      const claimCountEl = document.getElementById("claimCount");
+      let giftCount = 0,
+        claimCount = 0;
       const incGift = () => (giftCountEl.textContent = ++giftCount);
       const incClaim = () => (claimCountEl.textContent = ++claimCount);
       const decClaim = () =>
         (claimCountEl.textContent = claimCount = Math.max(0, claimCount - 1));
 
-      // State maps
-      const commentCards = new Map(); // tiktokId -> div
-      const claimCards = new Map(); // tiktokId -> details
+      const claimCards = new Map();
 
-      // Gift card
+      // === Render Gift ===
       function renderGift(p) {
+        const sxValue = (p.coins * 0.5).toFixed(2);
         const card = document.createElement("div");
         card.className =
           "rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/50";
-        const coinBadge =
-          typeof p.coins === "number"
-            ? `<span class="ml-2 inline-flex items-center gap-1 text-[11px] rounded-full border px-2 py-0.5 border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">${p.coins} coin</span>`
-            : "";
         card.innerHTML = `
       <div class="flex items-start gap-3">
         ${avatar(p.nickname)}
@@ -240,10 +324,12 @@
               <span class="ml-1 text-xs text-slate-500">(${p.tiktokId})</span>
             </div>
             <div>
-              <span class="inline-flex items-center gap-1 text-xs font-semibold rounded-full border px-2 py-0.5 border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800 dark:bg-violet-900/20 dark:text-violet-300">
-                ${p.giftName} ×${p.repeatCount}
-              </span>
-              ${coinBadge}
+              <span class="text-xs rounded-full border px-2 py-0.5">${
+                p.giftName
+              } ×${p.repeatCount}</span>
+              <span class="sx-badge text-xs rounded-full border px-2 py-0.5 cursor-pointer" data-sx="${sxValue}sx">${
+          p.coins
+        } coin ≈ ${sxValue}sx</span>
             </div>
           </div>
           <div class="text-xs text-slate-500 mt-1">${timeStr(p.timestamp)}</div>
@@ -253,115 +339,28 @@
         incGift();
       }
 
-      // Claim card (tombol HAPUS di summary, selalu terlihat)
+      // === Render Claim ===
       function renderClaim(p) {
+        const sxValue = (p.totalCoins ?? 0) * 0.5;
+        const totalSX = formatSX(sxValue);
         const comments = Array.isArray(p.lastComments) ? p.lastComments : [];
 
-        // replace jika sudah ada
-        const existing = claimCards.get(p.tiktokId);
-        if (existing) {
-          existing.remove();
-          claimCards.delete(p.tiktokId);
-        }
+        let card = claimCards.get(p.tiktokId);
 
-        const card = document.createElement("details");
-        card.className =
-          "rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/50";
-        card.open = true; // default kebuka agar semuanya langsung terlihat
-        claimCards.set(p.tiktokId, card);
-
-        card.innerHTML = `
-      <summary class="flex items-start gap-3">
-        ${avatar(p.nickname)}
-        <div class="min-w-0 flex-1">
-          <div class="flex items-center justify-between">
-            <div class="truncate font-semibold">
-              ${p.nickname}
-              <span class="ml-1 text-xs text-slate-500">(${p.tiktokId})</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="inline-flex items-center gap-1 text-xs font-semibold rounded-full border px-2 py-0.5 border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300">
-                Total Coin: ${p.totalCoins ?? 0}
-              </span>
-              <button type="button" class="delete-btn inline-flex items-center rounded-md bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold px-3 py-1.5 transition">
-                ❌ Hapus
-              </button>
-            </div>
-          </div>
-          <div class="mt-1">
-            <span class="text-sm text-slate-600 dark:text-slate-200">Klaim:</span>
-            <span class="ml-1 text-base font-bold text-emerald-600 dark:text-emerald-300">@${
-              p.claimedUsername
-            }</span>
-          </div>
-          <div class="text-xs text-slate-500 mt-1">${timeStr(p.timestamp)}</div>
-        </div>
-        <div class="chev ml-3 text-slate-400 transition-transform">▼</div>
-      </summary>
-
-      <div class="mt-3 pl-12">
-        ${
-          comments.length
-            ? `
-              <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Komentar terakhir (maks 5):</div>
-              <ul class="space-y-1">
-                ${comments
-                  .map(
-                    (c, i) => `
-                  <li class="text-sm text-slate-700 dark:text-slate-200">
-                    <span class="text-slate-400 dark:text-slate-500 mr-1">#${
-                      i + 1
-                    }</span>${c}
-                  </li>`
-                  )
-                  .join("")}
-              </ul>
-            `
-            : `<div class="text-sm text-slate-500 dark:text-slate-400">Belum ada riwayat komentar.</div>`
-        }
-      </div>
-    `;
-
-        // Tombol Hapus -> hapus lokal + reset server + broadcast remove
-        card.querySelector(".delete-btn").addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation(); // jangan toggle <details>
-
-          if (claimCards.has(p.tiktokId)) {
-            claimCards.get(p.tiktokId).remove();
-            claimCards.delete(p.tiktokId);
-            decClaim();
-          }
-          const c = commentCards.get(p.tiktokId);
-          if (c) {
-            c.remove();
-            commentCards.delete(p.tiktokId);
-          }
-
-          socket.emit("resolve_claim", {
-            tiktokId: p.tiktokId,
-            timestamp: Date.now(),
-          });
-        });
-
-        claimsEl.prepend(card);
-        incClaim();
-        console.log("[UI] renderClaim:", p); // log bantu debug
-      }
-
-      // Comments (rolling ≤5) + CLIENT-SIDE FALLBACK to claim
-      function renderCommentsUpdate(p) {
-        let card = commentCards.get(p.tiktokId);
         if (!card) {
-          card = document.createElement("div");
+          // kalau belum ada card → bikin baru
+          card = document.createElement("details");
           card.className =
             "rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/50";
-          commentCards.set(p.tiktokId, card);
+          card.open = true;
           claimsEl.prepend(card);
+          claimCards.set(p.tiktokId, card);
+          incClaim();
         }
 
+        // isi card selalu diupdate
         card.innerHTML = `
-    <div class="flex items-start gap-3">
+    <summary class="flex items-start gap-3">
       ${avatar(p.nickname)}
       <div class="min-w-0 flex-1">
         <div class="flex items-center justify-between">
@@ -370,82 +369,46 @@
             <span class="ml-1 text-xs text-slate-500">(${p.tiktokId})</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="inline-flex items-center gap-1 text-xs font-semibold rounded-full border px-2 py-0.5 border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
-              Coins: ${p.totalCoins ?? 0}
+            <span class="text-xs rounded-full border px-2 py-0.5">
+              ${p.totalCoins ?? 0} coin
             </span>
-            <!-- Tombol Hapus selalu muncul -->
-            <button type="button"
-              class="delete-btn inline-flex items-center rounded-md bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold px-3 py-1.5 transition"
-              title="Hapus & reset state">
-              ❌ Hapus
-            </button>
+            <span class="sx-badge text-xs rounded-full border px-2 py-0.5 cursor-pointer" data-sx="${sxValue}">
+              ≈ ${totalSX}
+            </span>
+            <button class="delete-btn bg-rose-500 text-white text-xs px-3 py-1.5 rounded-md">❌ Hapus</button>
           </div>
         </div>
-
-        <div class="mt-2">
-          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
-            Komentar (maks 5, terbaru di bawah):
-          </div>
-          <ul class="space-y-1">
-            ${(p.comments || [])
-              .map(
-                (c, i) => `
-                <li class="text-sm text-slate-700 dark:text-slate-200">
-                  <span class="text-slate-400 dark:text-slate-500 mr-1">#${
-                    i + 1
-                  }</span>${c}
-                </li>`
-              )
-              .join("")}
-          </ul>
-        </div>
-
-        <div class="text-xs text-slate-500 mt-2">${timeStr(p.timestamp)}</div>
+        <div class="mt-1">Klaim: <b>@${p.claimedUsername}</b></div>
+        <div class="text-xs text-slate-500 mt-1">${timeStr(p.timestamp)}</div>
       </div>
-    </div>
-  `;
+    </summary>
+    <div class="mt-3 pl-12">
+      ${
+        comments.length
+          ? `<ul class="space-y-1">${comments
+              .map(
+                (c, i) =>
+                  `<li class="text-sm"><span class="text-slate-400">#${
+                    i + 1
+                  }</span> ${c}</li>`
+              )
+              .join("")}</ul>`
+          : `<div class="text-sm text-slate-500">Belum ada komentar.</div>`
+      }
+    </div>`;
 
-        // Handler tombol Hapus (selalu ada)
-        const btn = card.querySelector(".delete-btn");
-        if (btn && !btn._wired) {
-          btn._wired = true; // cegah double-bind saat re-render
-          btn.addEventListener("click", (e) => {
-            e.preventDefault();
-
-            // 1) Hapus kartu komentar ini
-            const c = commentCards.get(p.tiktokId);
-            if (c) {
-              c.remove();
-              commentCards.delete(p.tiktokId);
-            }
-
-            // 2) Jika ada kartu klaim untuk user ini, hapus juga & kurangi counter
-            const claim = claimCards.get(p.tiktokId);
-            if (claim) {
-              claim.remove();
-              claimCards.delete(p.tiktokId);
-              // decClaim() dari variabel globalmu
-              if (typeof decClaim === "function") decClaim();
-            }
-
-            // 3) Beritahu server untuk RESET state (gift berikutnya mulai dari nol)
-            socket.emit("resolve_claim", {
-              tiktokId: p.tiktokId,
-              timestamp: Date.now(),
-            });
-          });
-        }
+        // wiring tombol hapus
+        card.querySelector(".delete-btn").addEventListener("click", () => {
+          card.remove();
+          claimCards.delete(p.tiktokId);
+          decClaim();
+          socket.emit("resolve_claim", { tiktokId: p.tiktokId });
+        });
       }
 
-      // Socket events
+      // === Socket Events ===
       socket.on("gift", renderGift);
-      socket.on("claim", (p) => {
-        console.log("[socket] claim:", p);
-        renderClaim(p);
-      });
-      socket.on("comments_update", renderCommentsUpdate);
-
-      // Hapus sinkron bila ada client lain yang menghapus
+      socket.on("claim", renderClaim);
       socket.on("claim_removed", ({ tiktokId }) => {
         const card = claimCards.get(tiktokId);
         if (card) {
@@ -453,10 +416,100 @@
           claimCards.delete(tiktokId);
           decClaim();
         }
-        const c = commentCards.get(tiktokId);
-        if (c) {
-          c.remove();
-          commentCards.delete(tiktokId);
+      });
+
+      // === Calculator Fee (versi SX + username) ===
+      const TEN_POW_21 = 10n ** 21n;
+
+      function parseToBigInt(input) {
+        let clean = input.toLowerCase().trim();
+        if (clean.endsWith("sx")) {
+          clean = clean.replace("sx", "");
+          if (clean.includes(".")) {
+            // contoh: 1.5sx
+            const [whole, frac] = clean.split(".");
+            const wholePart = BigInt(whole) * TEN_POW_21;
+            const fracStr = (frac + "000000000000000000000").slice(0, 21); // pad ke 21 digit
+            const fracPart = BigInt(fracStr);
+            return wholePart + fracPart;
+          } else {
+            // contoh: 5sx
+            return BigInt(clean) * TEN_POW_21;
+          }
+        }
+        return BigInt(clean); // fallback kalau input angka biasa
+      }
+
+      function formatBigIntFull(val) {
+        return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      }
+
+      function formatToSX(val) {
+        if (val === 0n) return "0sx";
+        const whole = val / TEN_POW_21;
+        const remainder = val % TEN_POW_21;
+        if (remainder === 0n) {
+          return `${whole}sx`;
+        } else {
+          const frac = String(remainder).padStart(21, "0").slice(0, 3);
+          return `${whole}.${frac}sx`;
+        }
+      }
+
+      function hitungCalc(extraUser = "") {
+        try {
+          const input = document.getElementById("calcInput").value.trim();
+          const pct = parseFloat(document.getElementById("feePercent").value);
+
+          const base = parseToBigInt(input); // konversi dari SX → BigInt
+          const fee = (base * BigInt(Math.round(pct * 10))) / 1000n;
+          const total = base + fee;
+
+          // tampilkan hasil dalam angka full
+          document.getElementById("calcBase").textContent =
+            formatBigIntFull(base) + (extraUser ? ` (oleh @${extraUser})` : "");
+          document.getElementById("calcFee").textContent =
+            formatBigIntFull(fee) + " (" + pct + "%)";
+          document.getElementById("calcTotal").textContent =
+            formatBigIntFull(total);
+
+          document.getElementById("calcResult").classList.remove("hidden");
+          document.getElementById("calcError").classList.add("hidden");
+        } catch (e) {
+          document.getElementById("calcError").textContent =
+            "Error: " + e.message;
+          document.getElementById("calcError").classList.remove("hidden");
+          document.getElementById("calcResult").classList.add("hidden");
+        }
+      }
+
+      function copyCalc() {
+        navigator.clipboard.writeText(
+          document.getElementById("calcTotal").innerText
+        );
+      }
+
+      // Klik badge SX → auto masuk calculator + tampilkan username
+      document.addEventListener("click", (e) => {
+        if (e.target.matches(".sx-badge")) {
+          const val = e.target.getAttribute("data-sx");
+          const card = e.target.closest("details, div"); // cari parent card
+          const username = card
+            ? card
+                .querySelector(".font-semibold")
+                ?.textContent.trim()
+                .split(" ")[0]
+            : "";
+
+          document.getElementById("calcInput").value = val; // otomatis isi angka
+          if (!val.endsWith("sx")) {
+            document.getElementById("calcInput").value = val + "sx"; // auto tambah "sx"
+          }
+
+          hitungCalc(username);
+          document
+            .getElementById("calcInput")
+            .scrollIntoView({ behavior: "smooth", block: "center" });
         }
       });
     </script>
